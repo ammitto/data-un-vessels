@@ -92,10 +92,35 @@ This will generate YAML files in the `processed/` directory.
 Vessels frequently change names and flags. The **IMO number** is the primary
 unique identifier and should be used for matching.
 
+== Knowledge Graph Integration
+
+This repository's processed YAML data feeds into the Ammitto knowledge graph.
+
+When the harmonization process runs:
+
+[source,shell]
+----
+# Auto-detect all data-* repos and harmonize
+ammitto harmonize --scan --sources-dir /path/to/repos --output-dir ./api/v1
+----
+
+The un_vessels data is transformed into:
+
+* Individual JSON-LD nodes in `api/v1/node/entity/un_vessels/{id}.jsonld`
+* Sanction entries in `api/v1/node/entry/un_vessels/{id}.jsonld`
+* Lightweight search index entries
+* Facet counts for filtering
+
 == Usage
 
 This data is part of the https://github.com/ammitto/ammitto[Ammitto] sanctions
 screening system.
+
+== Related Repositories
+
+* https://github.com/ammitto/ammitto[ammitto] - Main Ruby gem with harmonization
+* https://github.com/ammitto/data[data] - Harmonized knowledge graph output
+* https://github.com/ammitto/ammitto.github.io[ammitto.github.io] - Website with search
 
 == License
 
