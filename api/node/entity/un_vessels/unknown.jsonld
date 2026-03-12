@@ -1,0 +1,16 @@
+{
+  "id": "https://www.ammitto.org/entity/un_vessels/unknown",
+  "entity_type": "vessel",
+  "names": [
+    {
+      "full_name": "KOTI",
+      "is_primary": true
+    }
+  ],
+  "source_references": [
+    {
+      "source_code": "un_vessels"
+    }
+  ],
+  "@context": "https://www.ammitto.org/ontology/context.jsonld"
+}
