@@ -59,6 +59,95 @@ imo_number: '7303803'
 date_designated: 30-Mar-18
 ----
 
+== Source Data Format
+
+The processed YAML files in `processed/` follow this structure:
+
+=== Vessel Entity
+[source,yaml]
+----
+id: un-vessel-7303803
+entity_type: vessel
+names:
+  - full_name: AN SAN 1
+    is_primary: true
+imo_number: '7303803'
+date_designated: 30-Mar-18
+----
+
+=== Field Definitions
+
+[cols="1,4"]
+|===
+| Field | Description
+
+| `id`
+| Unique identifier for the vessel
+
+| `entity_type`
+| Entity type: vessel
+
+| `names`
+| Array of name variants with full_name and is_primary flag
+
+| `imo_number`
+| International Maritime Organization number (primary identifier)
+
+| `date_designated`
+| Date the vessel was designated
+
+|===
+
+== Harmonized Data Format
+
+After harmonization, entities are transformed into JSON-LD format:
+
+=== Entity (JSON-LD)
+[source,json]
+----
+{
+  "@context": "https://www.ammitto.org/schema/v1/context.jsonld",
+  "@id": "https://www.ammitto.org/entity/un_vessels/7303803",
+  "@type": "VesselEntity",
+  "names": [
+    {
+      "@type": "NameVariant",
+      "fullName": "AN SAN 1",
+      "script": "Latn",
+      "isPrimary": true
+    }
+  ],
+  "imoNumber": "7303803",
+  "sanctionEntries": [
+    {
+      "@id": "https://www.ammitto.org/entry/un_vessels/7303803",
+      "@type": "SanctionEntry",
+      "authority": {
+        "@id": "https://www.ammitto.org/authority/un",
+        "name": "United Nations"
+      },
+      "regime": {
+        "@type": "SanctionRegime",
+        "code": "DPRK",
+        "name": "DPRK (1718 Committee)"
+      },
+      "effects": [
+        {
+          "@type": "SanctionEffect",
+          "effectType": "asset_freeze",
+          "scope": "full"
+        }
+      ],
+      "status": "active",
+      "period": {
+        "@type": "TemporalPeriod",
+        "listedDate": "2018-03-30"
+      }
+    }
+  ]
+}
+----
+
 == Processing
 
 The source PDF must be converted to HTML before running the parser script.
