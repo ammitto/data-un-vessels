@@ -1,0 +1,13 @@
+---
+id: un-vessel-8606173
+entity_type: vessel
+names:
+- full_name: Ryong Gun Bong
+  is_primary: true
+- full_name: Chol Ryong
+  is_primary: false
+- full_name: Pukchong 33
+  is_primary: false
+imo_number: '8606173'
+date_designated: '2017-06-21'
+resolution: Resolution 1718 (2006)

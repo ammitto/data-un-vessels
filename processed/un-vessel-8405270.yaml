@@ -1,0 +1,13 @@
+---
+id: un-vessel-8405270
+entity_type: vessel
+names:
+- full_name: Hwang Gum San 2
+  is_primary: true
+- full_name: Hui Chon
+  is_primary: false
+- full_name: Song Phyong
+  is_primary: false
+imo_number: '8405270'
+date_designated: '2017-06-21'
+resolution: Resolution 1718 (2006)

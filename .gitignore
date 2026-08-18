@@ -26,6 +26,9 @@ CLAUDE.md
 downloaded/*
 !downloaded/.gitkeep
 
-# Processed data (keep directory)
-processed/*
-!processed/.gitkeep
+# processed/ is deliberately NOT ignored. The daily fetch writes the
+# parsed vessel YAML there, and ignoring it meant every run rebuilt the
+# same files, saw no git changes, and committed nothing — so the
+# harmonizer downstream found no input and failed the whole publish for
+# every other source too. The fetch output is the product of this repo,
+# not a build artefact.
