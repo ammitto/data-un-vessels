@@ -1,0 +1,13 @@
+---
+id: un-vessel-8829555
+entity_type: vessel
+names:
+- full_name: Po Thong Gang
+  is_primary: true
+- full_name: O Rang
+  is_primary: false
+- full_name: Song Phyong 1
+  is_primary: false
+imo_number: '8829555'
+date_designated: '2017-06-21'
+resolution: Resolution 1718 (2006)
