@@ -1,204 +1,115 @@
-= UN Security Council Designated Vessels List
+= Ammitto UN 1718 vessel sanctions data
 
-image:https://img.shields.io/github/license/ammitto/data-un-vessels.svg[License]
-image:https://github.com/ammitto/data-un-vessels/actions/workflows/fetch.yml/badge.svg["Update Status", link="https://github.com/ammitto/data-un-vessels/actions/workflows/fetch.yml"]
+image:https://github.com/ammitto/data-un-vessels/actions/workflows/fetch.yml/badge.svg["Fetch Data", link="https://github.com/ammitto/data-un-vessels/actions/workflows/fetch.yml"]
 
-== Purpose
-
-This repository contains designated vessels subject to sanctions by the
-United Nations Security Council (UNSC), specifically vessels designated under
-Resolution 1718 (DPRK sanctions).
+This repository stores UN Security Council 1718 Committee vessel
+designations as YAML for Ammitto. The committee was established pursuant
+to resolution 1718 (2006), on North Korea; `processed/` holds one file per
+vessel.
 
 == Source
 
-* **Authority**: United Nations Security Council
-* **Committee**: 1718 Committee (DPRK Sanctions)
-* **URL**: https://main.un.org/securitycouncil/sanctions/1718
-* **Vessel List PDF**: https://main.un.org/securitycouncil/sites/default/files/1718_designated_vessels_list_final.pdf
-* **Format**: PDF (requires manual conversion to structured data)
-* **Update Frequency**: As updated by the 1718 Committee
-* **Country Code**: UN (International)
+* Publisher: United Nations Security Council, Committee established pursuant to resolution 1718 (2006)
+* Committee page: https://main.un.org/securitycouncil/en/sanctions/1718
+* List page: https://main.un.org/securitycouncil/en/sanctions/1718/materials/1718-Designated-Vessels-List
+* File downloaded (PDF): https://main.un.org/securitycouncil/sites/default/files/1718_designated_vessels_list_final.pdf
 
-== Legal Basis
+The committee page sets out the measures that apply to designated vessels,
+such as port entry bans, de-flagging and asset freezes.
 
-These vessels are designated under:
+== Contents
 
-* UN Security Council Resolution 1718 (2006)
-* UN Security Council Resolution 1874 (2009)
-* UN Security Council Resolution 2087 (2013)
-* UN Security Council Resolution 2094 (2013)
-* UN Security Council Resolution 2270 (2016)
-* UN Security Council Resolution 2321 (2016)
-* UN Security Council Resolution 2356 (2017)
-* UN Security Council Resolution 2371 (2017)
-* UN Security Council Resolution 2375 (2017)
-* UN Security Council Resolution 2397 (2017)
+`processed/` holds one file per vessel, named after its IMO number:
+`processed/un-vessel-7303803.yaml` is IMO 7303803. A vessel listed without an
+IMO number is named after the vessel name instead, such as
+`processed/un-vessel-min-ning-de-you-078.yaml`.
 
-== Directory Structure
+`processed/_index.yaml` lists every file, with the time of the last fetch.
 
-```
-data-un-vessels/
-├── processed/         # Processed YAML files (one per vessel)
-├── reference-docs/    # Reference documentation and converted HTML
-└── README.adoc        # This file
-```
-
-== Data Format
-
-Each processed vessel is stored as a YAML file with the following structure:
-
-[source,yaml]
-----
-id: un-vessel-7303803
-entity_type: vessel
-names:
-  - full_name: AN SAN 1
-    is_primary: true
-imo_number: '7303803'
-date_designated: 30-Mar-18
-----
-
-== Source Data Format
-
-The processed YAML files in `processed/` follow this structure:
-
-=== Vessel Entity
-[source,yaml]
-----
-id: un-vessel-7303803
-entity_type: vessel
-names:
-  - full_name: AN SAN 1
-    is_primary: true
-imo_number: '7303803'
-date_designated: 30-Mar-18
-----
-
-=== Field Definitions
-
-[cols="1,4"]
+[cols="1,1,3"]
 |===
-| Field | Description
+| Key | Type | Meaning
 
-| `id`
-| Unique identifier for the vessel
-
-| `entity_type`
-| Entity type: vessel
-
-| `names`
-| Array of name variants with full_name and is_primary flag
-
-| `imo_number`
-| International Maritime Organization number (primary identifier)
-
-| `date_designated`
-| Date the vessel was designated
-
+| `id` | string | Identifier, such as `un-vessel-7303803`
+| `entity_type` | string | Always `vessel`
+| `names` | list | Names: `full_name`, and `is_primary` (true for the main name, false for other names)
+| `imo_number` | string | IMO number, where listed
+| `date_designated` | string | Designation date, `YYYY-MM-DD`
+| `resolution` | string | Always `Resolution 1718 (2006)`, the committee's founding resolution, for every vessel
 |===
 
-== Harmonized Data Format
 
-After harmonization, entities are transformed into JSON-LD format:
+`reference-docs/` holds a copy of the PDF list and an HTML version of it.
 
-=== Entity (JSON-LD)
-[source,json]
+== Using the data
+
+Clone or download this repository and run either example from its root
+directory.
+
+Ruby:
+
+[source,ruby]
 ----
-{
-  "@context": "https://www.ammitto.org/schema/v1/context.jsonld",
-  "@id": "https://www.ammitto.org/entity/un_vessels/7303803",
-  "@type": "VesselEntity",
-  "names": [
-    {
-      "@type": "NameVariant",
-      "fullName": "AN SAN 1",
-      "script": "Latn",
-      "isPrimary": true
-    }
-  ],
-  "imoNumber": "7303803",
-  "sanctionEntries": [
-    {
-      "@id": "https://www.ammitto.org/entry/un_vessels/7303803",
-      "@type": "SanctionEntry",
-      "authority": {
-        "@id": "https://www.ammitto.org/authority/un",
-        "name": "United Nations"
-      },
-      "regime": {
-        "@type": "SanctionRegime",
-        "code": "DPRK",
-        "name": "DPRK (1718 Committee)"
-      },
-      "effects": [
-        {
-          "@type": "SanctionEffect",
-          "effectType": "asset_freeze",
-          "scope": "full"
-        }
-      ],
-      "status": "active",
-      "period": {
-        "@type": "TemporalPeriod",
-        "listedDate": "2018-03-30"
-      }
-    }
-  ]
-}
+require "yaml"
+
+Dir.glob("processed/un-vessel-*.yaml").sort.each do |path|
+  vessel = YAML.safe_load_file(path)
+  name = vessel["names"].find { |n| n["is_primary"] }["full_name"]
+  puts [vessel["imo_number"], name, vessel["date_designated"]].join("\t")
+end
 ----
 
-== Processing
+Python (requires PyYAML, installed with `python3 -m pip install PyYAML`):
 
-The source PDF must be converted to HTML before running the parser script.
-
-=== Converting PDF to HTML
-
-Install `poppler-utils` (for `pdftohtml`) or use an online converter:
-
-[source,shell]
+[source,python]
 ----
-# Using poppler-utils (macOS)
-brew install poppler
+import glob
+import yaml
 
-# Convert PDF to HTML
-pdftohtml -c -noframes reference-docs/1718_designated_vessels_list_final.pdf reference-docs/1718_designated_vessels_list_final.html
+for path in sorted(glob.glob("processed/un-vessel-*.yaml")):
+    with open(path, encoding="utf-8") as f:
+        vessel = yaml.safe_load(f)
+    name = next(n["full_name"] for n in vessel["names"] if n["is_primary"])
+    print(vessel.get("imo_number", ""), name, vessel["date_designated"], sep="\t")
 ----
 
-=== Running the Parser
-
-After conversion, run the parser from the ammitto gem root:
-
-[source,shell]
-----
-bundle exec ruby scripts/parse_un_vessels_list.rb
-----
-
-This will generate YAML files in the `processed/` directory.
-
-== Important Note
-
-Vessels frequently change names and flags. The **IMO number** is the primary
-unique identifier and should be used for matching.
-
-== Knowledge Graph Integration
-
-This repository's processed YAML data feeds into the Ammitto knowledge graph.
-
-Harmonized JSON-LD for this source:
+The same list, harmonized with the other sources into JSON-LD:
 https://www.ammitto.org/api/v1/sources/un_vessels.jsonld
 
-== Usage
+== Updates
 
-This data is part of the https://github.com/ammitto/ammitto[Ammitto] sanctions
-screening system.
+The `Fetch Data` workflow (`.github/workflows/fetch.yml`) downloads the list
+every day at 06:00 UTC and commits any change to `processed/`. It runs with
+`--prune`, so a vessel the committee has removed is deleted here on the next
+fetch.
 
-== Related Repositories
+== Development
 
-* https://github.com/ammitto/ammitto[ammitto] - Main Ruby gem with harmonization
-* https://github.com/ammitto/data[data] - Harmonized knowledge graph output
-* https://github.com/ammitto/ammitto.github.io[ammitto.github.io] - Website with search
+`processed/` is generated by the Ammitto gem. To refresh it locally, use
+Ruby 3.4 (the version selected by the fetch workflow) and Bundler. From
+the repository root, run:
+
+[source,shell]
+----
+bundle install
+bundle exec ammitto fetch un_vessels --format yaml --output-dir processed --verbose --prune
+----
+
+`--prune` removes files for listings no longer present in the fetched list.
+Review the generated changes before committing them.
+
+Fetch and parser changes belong in the
+https://github.com/ammitto/ammitto[Ammitto gem]; its source models are in
+https://github.com/ammitto/ammitto/tree/main/lib/ammitto/sources/un_vessels[`lib/ammitto/sources/un_vessels/`].
+Report data or source-list issues in
+https://github.com/ammitto/data-un-vessels/issues[this repository].
 
 == License
 
 Data is sourced from official United Nations publications.
 Repository structure and processing code are under the MIT License.
+
+== Related
+
+* https://www.ammitto.org[ammitto.org]: search across all sources
+* https://github.com/ammitto/ammitto[ammitto]: the Ruby gem that fetches and harmonizes this data
