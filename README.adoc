@@ -76,6 +76,52 @@ for path in sorted(glob.glob("processed/un-vessel-*.yaml")):
 The same list, harmonized with the other sources into JSON-LD:
 https://www.ammitto.org/api/v1/sources/un_vessels.jsonld
 
+== Harmonized field mapping
+
+The https://github.com/ammitto/ammitto/blob/main/lib/ammitto/sources/un_vessels/transformer.rb[un_vessels transformer]
+maps the processed source fields below to canonical Ruby attributes.
+Entity classes are in `Ammitto::Ontology::Entities`, entry/regime classes in
+`Ammitto::Ontology::Sanction`, and nested values in
+`Ammitto::Ontology::ValueObjects`. JSON-LD serialization can use different keys.
+
+[cols="2,2,4",options="header"]
+|===
+| Source fields | Canonical target | Transformation
+
+| `imo_number`, `names`
+| `VesselEntity.id`, `SanctionEntry.id`, `entity_id`
+| Use the IMO number as the local ID, falling back to a slug of the selected vessel name.
+
+| `names[].full_name`, `names[].is_primary`
+| `VesselEntity.names` (`NameVariant`)
+| Use the primary source name, or the first name as fallback; retain non-primary names as aliases.
+
+| `imo_number`, `flag_state`
+| `VesselEntity.imo_number`, `flag_state`
+| Copy the vessel identifiers and flag.
+
+| `tonnage`, `build_year`
+| `VesselEntity.gross_tonnage`, `build_year`
+| Use the integer values read by the source model.
+
+| `date_designated`
+| `SanctionEntry.period.listed_date` (`TemporalPeriod`)
+| The YAML key populates source `designation_date`; the canonical period is indefinite.
+
+| `resolution`
+| `SanctionEntry.regime` (`SanctionRegime`)
+| Map 1718, 1737/2231 and 1970/1973 to their configured regime codes, with a generic UN fallback.
+
+| `resolution`, `imo_number`, `names`
+| `VesselEntity.source_references` (`SourceReference`)
+| Retain the resolution and local reference; record source code `un_vessels` and harmonization time in `fetched_at`.
+
+| Source-wide transformer defaults
+| `SanctionEntry.status`, `effects` (`SanctionEffect`)
+| Set active status and the configured asset-freeze and transport-sanction effects.
+
+|===
+
 == Updates
 
 The `Fetch Data` workflow (`.github/workflows/fetch.yml`) downloads the list
